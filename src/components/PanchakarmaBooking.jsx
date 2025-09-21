@@ -1,10 +1,7 @@
 import React, { useState } from "react";
 import { centers, therapyTypes, slots } from "./panchakarmaData";
-// shadcn/ui imports (assume installed):
-// import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-// import { Button } from "@/components/ui/button";
-// import { Input } from "@/components/ui/input";
-// import { Select, SelectItem } from "@/components/ui/select";
+import { FiSearch, FiMapPin, FiClock, FiArrowLeft } from 'react-icons/fi';
+import { BiRupee } from 'react-icons/bi';
 
 const PanchakarmaBooking = () => {
   const [search, setSearch] = useState("");
@@ -33,148 +30,210 @@ const PanchakarmaBooking = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4 text-center">Panchakarma Appointment Booking</h1>
-      {/* Search & Filter Bar */}
-      <div className="flex flex-col md:flex-row gap-2 mb-6">
-        <input
-          type="text"
-          placeholder="Search by center or location"
-          className="border rounded px-3 py-2 w-full md:w-1/2"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <select
-          className="border rounded px-3 py-2 w-full md:w-1/3"
-          value={therapyFilter}
-          onChange={(e) => setTherapyFilter(e.target.value)}
-        >
-          <option value="">All Therapies</option>
-          {therapyTypes.map((type) => (
-            <option key={type} value={type}>{type}</option>
-          ))}
-        </select>
-      </div>
-
-      {/* Center List */}
-      {!selectedCenter && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {filteredCenters.map((center) => (
-            <div
-              key={center.id}
-              className="border rounded-lg shadow hover:shadow-lg p-4 cursor-pointer bg-white"
-              onClick={() => setSelectedCenter(center)}
-            >
-              <h2 className="font-semibold text-lg">{center.name}</h2>
-              <p className="text-gray-600">{center.location}</p>
-              <div className="mt-2">
-                <span className="font-medium">Therapies:</span>
-                <ul className="list-disc ml-5 text-sm">
-                  {center.therapies.map((t) => (
-                    <li key={t.id}>{t.name}</li>
-                  ))}
-                </ul>
-              </div>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50">
+      <div className="max-w-6xl mx-auto p-4">
+        {/* Top Navigation Bar */}
+        <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b mb-6 -mx-4 px-4 py-4">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+              Panchakarma Centers
+            </h1>
+            {/* Search Bar */}
+            <div className="relative w-1/3">
+              <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search centers..."
+                className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
             </div>
-          ))}
-          {filteredCenters.length === 0 && (
-            <div className="col-span-2 text-center text-gray-500">No centers found.</div>
-          )}
+          </div>
         </div>
-      )}
 
-      {/* Therapies for Selected Center */}
-      {selectedCenter && !selectedTherapy && (
-        <div>
-          <button
-            className="mb-4 text-blue-600 hover:underline"
-            onClick={() => setSelectedCenter(null)}
-          >
-            ← Back to Centers
-          </button>
-          <h2 className="text-xl font-semibold mb-2">{selectedCenter.name} Therapies</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {selectedCenter.therapies.map((therapy) => (
+        {/* Main Content */}
+        {!selectedCenter && (
+          <div className="space-y-4">
+            {filteredCenters.map((center) => (
               <div
-                key={therapy.id}
-                className="border rounded-lg p-4 bg-white shadow hover:shadow-lg cursor-pointer"
-                onClick={() => setSelectedTherapy(therapy)}
+                key={center.id}
+                className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 p-6 cursor-pointer border border-gray-100"
+                onClick={() => setSelectedCenter(center)}
               >
-                <h3 className="font-medium">{therapy.name}</h3>
-                <p className="text-gray-600 text-sm line-clamp-2">{therapy.description}</p>
-                <div className="flex justify-between mt-2 text-sm">
-                  <span>Duration: {therapy.duration} min</span>
-                  <span>₹{therapy.cost}</span>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                      {center.name}
+                    </h2>
+                    <div className="flex items-center text-gray-600 mb-3">
+                      <FiMapPin className="mr-2" />
+                      {center.location}
+                    </div>
+                    <p className="text-sm text-gray-500">
+                      {center.therapies.length} therapies available
+                    </p>
+                  </div>
+                  <div className="bg-purple-50 rounded-lg p-3">
+                    <div className="text-purple-600 font-medium">
+                      Starting from
+                      <div className="text-lg">
+                        ₹{Math.min(...center.therapies.map(t => t.cost))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
+            {filteredCenters.length === 0 && (
+              <div className="text-center py-10">
+                <div className="text-gray-400 text-lg">No centers found</div>
+              </div>
+            )}
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Package Details & Booking */}
-      {selectedTherapy && (
-        <div>
-          <button
-            className="mb-4 text-blue-600 hover:underline"
-            onClick={() => setSelectedTherapy(null)}
-          >
-            ← Back to Therapies
-          </button>
-          <div className="border rounded-lg p-6 bg-white shadow mb-4">
-            <h2 className="text-xl font-semibold mb-2">{selectedTherapy.name}</h2>
-            <p className="text-gray-700 mb-2">
-              {showFullDesc
-                ? selectedTherapy.description
-                : selectedTherapy.description.slice(0, 60) + (selectedTherapy.description.length > 60 ? "..." : "")}
-              {selectedTherapy.description.length > 60 && (
-                <button
-                  className="ml-2 text-blue-500 text-xs underline"
-                  onClick={() => setShowFullDesc((v) => !v)}
-                >
-                  {showFullDesc ? "View Less" : "View More"}
-                </button>
-              )}
-            </p>
-            <div className="flex gap-6 mb-2">
-              <span>Duration: <b>{selectedTherapy.duration} min</b></span>
-              <span>Cost: <b>₹{selectedTherapy.cost}</b></span>
+        {/* Therapies for Selected Center */}
+        {selectedCenter && !selectedTherapy && (
+          <div className="animate-fadeIn">
+            <button
+              className="mb-6 flex items-center text-gray-600 hover:text-purple-600 transition-colors"
+              onClick={() => setSelectedCenter(null)}
+            >
+              <FiArrowLeft className="mr-2" />
+              Back to Centers
+            </button>
+            
+            <div className="bg-white rounded-xl p-6 mb-6 shadow-sm">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">{selectedCenter.name}</h2>
+              <div className="flex items-center text-gray-600 mb-4">
+                <FiMapPin className="mr-2" />
+                {selectedCenter.location}
+              </div>
             </div>
-          </div>
 
-          {/* Slot Picker */}
-          <div className="mb-4">
-            <label className="block mb-1 font-medium">Select Slot:</label>
-            <div className="flex gap-2 flex-wrap">
-              {slots.map((slot) => (
-                <button
-                  key={slot}
-                  className={`px-4 py-2 rounded border ${selectedSlot === slot ? "bg-blue-500 text-white" : "bg-gray-100"}`}
-                  onClick={() => setSelectedSlot(slot)}
+            <h3 className="text-xl font-semibold mb-4 text-gray-800">Available Therapies</h3>
+            <div className="space-y-4">
+              {selectedCenter.therapies.map((therapy) => (
+                <div
+                  key={therapy.id}
+                  className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer border border-gray-100"
+                  onClick={() => setSelectedTherapy(therapy)}
                 >
-                  {slot}
-                </button>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">{therapy.name}</h3>
+                      <p className="text-gray-600 text-sm line-clamp-2 mb-3">{therapy.description}</p>
+                      <div className="flex items-center text-gray-500 text-sm">
+                        <FiClock className="mr-1" />
+                        {therapy.duration} minutes
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="flex items-center text-purple-600 font-semibold text-lg">
+                        <BiRupee className="text-xl" />
+                        {therapy.cost}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
+        )}
 
-          {/* Book Now Button */}
-          <button
-            className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 disabled:opacity-50"
-            disabled={!selectedSlot}
-            onClick={handleBook}
-          >
-            Book Now
-          </button>
+        {/* Package Details & Booking */}
+        {selectedTherapy && (
+          <div className="animate-fadeIn">
+            <button
+              className="mb-6 flex items-center text-gray-600 hover:text-purple-600 transition-colors"
+              onClick={() => setSelectedTherapy(null)}
+            >
+              <FiArrowLeft className="mr-2" />
+              Back to Therapies
+            </button>
 
-          {/* Booking Confirmation */}
-          {bookingConfirmed && (
-            <div className="mt-4 p-3 bg-green-100 border border-green-400 rounded text-green-800">
-              Appointment booked for <b>{selectedTherapy.name}</b> at <b>{selectedSlot}</b> in <b>{selectedCenter.name}</b>!
+            <div className="bg-white rounded-xl p-8 shadow-sm mb-6 border border-gray-100">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">{selectedTherapy.name}</h2>
+              <div className="prose prose-purple mb-4">
+                <p className="text-gray-700">
+                  {showFullDesc
+                    ? selectedTherapy.description
+                    : selectedTherapy.description.slice(0, 100) + (selectedTherapy.description.length > 100 ? "..." : "")}
+                  {selectedTherapy.description.length > 100 && (
+                    <button
+                      className="ml-2 text-purple-600 hover:text-purple-700 text-sm font-medium"
+                      onClick={() => setShowFullDesc((v) => !v)}
+                    >
+                      {showFullDesc ? "Show less" : "Read more"}
+                    </button>
+                  )}
+                </p>
+              </div>
+              
+              <div className="flex gap-8 mb-6 text-gray-700">
+                <div className="flex items-center">
+                  <FiClock className="mr-2 text-purple-600" />
+                  <span>{selectedTherapy.duration} minutes</span>
+                </div>
+                <div className="flex items-center">
+                  <BiRupee className="mr-1 text-xl text-purple-600" />
+                  <span className="text-lg font-semibold">{selectedTherapy.cost}</span>
+                </div>
+              </div>
+
+              {/* Slot Picker */}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-3 text-gray-800">Select Your Preferred Time</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {slots.map((slot) => (
+                    <button
+                      key={slot}
+                      className={`
+                        py-3 px-4 rounded-lg text-sm font-medium transition-all duration-200
+                        ${selectedSlot === slot 
+                          ? "bg-purple-600 text-white shadow-lg shadow-purple-200" 
+                          : "bg-gray-50 text-gray-700 hover:bg-purple-50 hover:text-purple-600"
+                        }
+                      `}
+                      onClick={() => setSelectedSlot(slot)}
+                    >
+                      {slot}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Book Now Button */}
+              <button
+                className={`
+                  w-full md:w-auto px-8 py-3 rounded-lg font-medium transition-all duration-200
+                  ${!selectedSlot 
+                    ? "bg-gray-100 text-gray-400 cursor-not-allowed" 
+                    : "bg-purple-600 text-white hover:bg-purple-700 shadow-lg shadow-purple-200"
+                  }
+                `}
+                disabled={!selectedSlot}
+                onClick={handleBook}
+              >
+                Book Appointment
+              </button>
             </div>
-          )}
-        </div>
-      )}
+
+            {/* Booking Confirmation */}
+            {bookingConfirmed && (
+              <div className="bg-green-50 border border-green-200 rounded-xl p-6 text-green-800 animate-fadeIn">
+                <div className="font-semibold text-lg mb-2">Booking Confirmed! 🎉</div>
+                <p>
+                  Your appointment for <span className="font-medium">{selectedTherapy.name}</span> has been scheduled for{" "}
+                  <span className="font-medium">{selectedSlot}</span> at{" "}
+                  <span className="font-medium">{selectedCenter.name}</span>.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
